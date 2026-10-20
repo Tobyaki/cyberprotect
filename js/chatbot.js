@@ -30,7 +30,7 @@ function createButton(text, callback, className = "menu-button") {
 function showWelcome() {
   chatBody.innerHTML = "";
 
-  addMessage(`<strong>Hello! Welcome to CyberProtect.</strong><br><br>I'm your Cybersecurity awareness assistant. I can help you learn cybersecurity basics, explore cybersecurity topics, and test your knowledge using real world scenarios.<br><br>What would you like to do?`)
+  addMessage(`<strong>Hello! Welcome to CyberProtect.</strong><br><br>I'm your Cybersecurity awareness assistant. I can help you learn cybersecurity basics, explore cybersecurity topics, and test your knowledge using real world scenarios.<br><br>What would you like to do?`, true)
 
   const menu = document.createElement("div");
 
@@ -54,7 +54,7 @@ function mainMenu() {
 async function showBeginnerLessons() {
   chatBody.innerHTML = "";
 
-  addMessage("<strong>Cybersecurity for beginners</strong><br><br>" + "Let's learn cybersecurity step by step.");
+  addMessage("<strong>Cybersecurity for beginners</strong><br><br>" + "Let's learn cybersecurity step by step.", true);
 
   try {
     const response = await fetch(`${API}/lessons`);
@@ -109,7 +109,7 @@ async function showLesson(id) {
     menu.className = "message bot";
 
     if (id < 17) {
-      menu.appendChild(createButton("Nest Lesson", () => showLesson(id + 1)));
+      menu.appendChild(createButton("Next Lesson", () => showLesson(id + 1)));
     }
 
     menu.appendChild(createButton("All Lessons", showBeginnerLessons));
@@ -125,7 +125,7 @@ async function showLesson(id) {
 function showMoreCybersecurity() {
   chatBody.innerHTML = "";
 
-  addMessage(`<strong>Know more about Cybersecurity</strong><br><br>Would you like to choose a topic or ask your own question?`);
+  addMessage(`<strong>Know more about Cybersecurity</strong><br><br>Would you like to choose a topic or ask your own question?`, true);
 
   const menu = document.createElement("div");
 
@@ -143,7 +143,7 @@ function showMoreCybersecurity() {
 function showTopics() {
   chatBody.innerHTML = "";
 
-  addMessage("<strong>Choose a cybersecurity topic:</strong>");
+  addMessage("<strong>Choose a cybersecurity topic:</strong>", true);
 
   const topics = ["Phishing", "Malware", "Ransomware", "Social Engineering", "Password attacks", "Identity theft", "Data breaches", "Network security"];
 
@@ -242,12 +242,14 @@ function addMessage(message, allowHtml = false) {
   }
 
   chatBody.appendChild(element);
+
+  chatBody.scrollTop = chatBody.scrollHeight;
 }
 
 function enableQuestionMode() {
   chatBody.innerHTML = "";
 
-  addMessage(`<strong>Ask a cybersecurity question</strong><br><br>Ask ne anything related to cybersecurity. For example:<br><br>- What is phishing?<br>- How can I protect my passord?<br>- What should I do if I clicked a suspicious link?`);
+  addMessage(`<strong>Ask a cybersecurity question</strong><br><br>Ask ne anything related to cybersecurity. For example:<br><br>- What is phishing?<br>- How can I protect my passord?<br>- What should I do if I clicked a suspicious link?`, true);
 
   input.focus();
 
@@ -292,7 +294,7 @@ async function sendMessage() {
 
       typing.remove();
 
-      addMessage(data.response);
+      addMessage(formatGeminiResponse(data.response), true);
     } catch (error) {
       typing.remove();
 
@@ -305,7 +307,7 @@ async function sendMessage() {
 async function startQuiz() {
   chatBody.innerHTML = "";
 
-  addMessage("<strong>Cybersecurity knowledge test</strong><br><br>" + "Choose the answer you think is safest.");
+  addMessage("<strong>Cybersecurity knowledge test</strong><br><br>" + "Choose the answer you think is safest.", true);
 
   try {
     const response = await fetch(`${API}/quiz/start`, {
@@ -375,9 +377,9 @@ async function answerQuiz(answer) {
     console.log("Quiz answer response:", data);
 
     if (data.correct) {
-      addMessage(`<span class="correct">Correct</span><br><br>${data.explanation}`);
+      addMessage(`<span class="correct">Correct</span><br><br>${data.explanation}`, true);
     } else {
-      addMessage(`<span class="incorrect">Not correct</span><br><br>${data.explanation}`);
+      addMessage(`<span class="incorrect">Not correct</span><br><br>${data.explanation}`, true);
     }
 
     if (data.finished) {
@@ -407,7 +409,7 @@ function showQuizResult(result) {
     feedback = "Nice effort. Use beginner lessons to strengthen your cybersecurity knowledge and try again.";
   }
 
-  addMessage(`<strong>Quiz complete!</strong><br><br><strong>Score:</strong>${result.score}/${result.totalQuestions}<br><strong>Correct:</strong>${result.correctAnswers}<br><strong>Incorrect:</strong>${result.incorrectAnswers}<br><strong>Percentage:</strong>${result.percentage}%<br><br>${feedback}`);
+  addMessage(`<strong>Quiz complete!</strong><br><br><strong>Score:</strong>${result.score}/${result.totalQuestions}<br><strong>Correct:</strong>${result.correctAnswers}<br><strong>Incorrect:</strong>${result.incorrectAnswers}<br><strong>Percentage:</strong>${result.percentage}%<br><br>${feedback}`, true);
 
   const menu = document.createElement("div");
 
