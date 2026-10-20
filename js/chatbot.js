@@ -186,9 +186,11 @@ async function askGeminiAboutTopic(topic) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: `Explain ${topic} to a university student who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips.`
+        message: `Explain ${topic} to a university student who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips. Use {b}{/b} tags for bold words rather than ** and use <br> for line breaks where necessary.`
       })
     });
+
+    const data = await response.json();
 
     console.log("Gemini response:", data);
 
@@ -274,7 +276,7 @@ async function sendMessage() {
 
       // chatBody.removeChild(typing);
 
-      addMessage("Unable to contact CyberConnect.");
+      addMessage("Unable to contact CyberProtect.");
     }
 }
 
