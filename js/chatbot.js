@@ -186,7 +186,7 @@ async function askGeminiAboutTopic(topic) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: `Explain ${topic} to a university student who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips. Use {b}{/b} tags for bold words rather than ** and use <br> for line breaks where necessary.`
+        message: `Explain ${topic} to a university student who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips.`
       })
     });
 
@@ -202,7 +202,7 @@ async function askGeminiAboutTopic(topic) {
 
     // typing.remove();
 
-    addMessage(data.response);
+    addMessage(formatGeminiResponse(data.response), true);
 
     const menu = document.createElement("div");
 
@@ -220,6 +220,28 @@ async function askGeminiAboutTopic(topic) {
 
     addMessage("Sorry, I couldn't contact the cybersecurity assistant");
   }
+}
+
+function formatGeminiResponse(text) {
+  const html = marked.parse(text, {
+    breaks: true
+  });
+
+  return DOMPurify.sanitize(html);
+}
+
+function addMessage(message, allowHtml = false) {
+  const element = document.createElement("div");
+
+  element.className = "message bot";
+
+  if (allowHtml) {
+    element.innerHTML = message;
+  } else {
+    element.textContent = message;
+  }
+
+  chatBody.appendChild(element);
 }
 
 function enableQuestionMode() {
