@@ -2,6 +2,7 @@ const chatBody = document.getElementById("chatBody");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const API = "https://cyberprotect-app-ghfgdnh3f2abevaa.austriaeast-01.azurewebsites.net/api/chat";
+// const API = "https://localhost:7249/api/chat";
 
 let currentLesson = 1;
 let quizSession = null;
@@ -30,14 +31,14 @@ function createButton(text, callback, className = "menu-button") {
 function showWelcome() {
   chatBody.innerHTML = "";
 
-  addMessage(`<strong>Hello! Welcome to CyberProtect.</strong><br><br>I'm your Cybersecurity awareness assistant. I can help you learn cybersecurity basics, explore cybersecurity topics, and test your knowledge using real world scenarios.<br><br>What would you like to do?`, true)
+  addMessage(`<strong>Hello! Welcome to CyberProtect.</strong><br><br>I'm your Cybersecurity awareness assistant. I can help you learn cybersecurity threat basics, explore topics, and test your knowledge using real world scenarios.<br><br>What would you like to do?`, true)
 
   const menu = document.createElement("div");
 
   menu.className = "message bot";
 
-  const beginner = createButton("Cybersecurity for beginners", showBeginnerLessons);
-  const topics = createButton("Know more about cybersecurity", showMoreCybersecurity);
+  const beginner = createButton("Basic threats for beginners", showBeginnerLessons);
+  const topics = createButton("Know more about threats", showMoreCybersecurity);
   const quiz = createButton("Test your knowledge", startQuiz);
 
   menu.appendChild(beginner);
@@ -54,7 +55,7 @@ function mainMenu() {
 async function showBeginnerLessons() {
   chatBody.innerHTML = "";
 
-  addMessage("<strong>Cybersecurity for beginners</strong><br><br>" + "Let's learn cybersecurity step by step.", true);
+  addMessage("<strong>Basic threats for beginners</strong><br><br>" + "Let's learn them step by step.", true);
 
   try {
     const response = await fetch(`${API}/lessons`);
@@ -125,7 +126,7 @@ async function showLesson(id) {
 function showMoreCybersecurity() {
   chatBody.innerHTML = "";
 
-  addMessage(`<strong>Know more about Cybersecurity</strong><br><br>Would you like to choose a topic or ask your own question?`, true);
+  addMessage(`<strong>Know more about threats</strong><br><br>Would you like to choose a topic or ask your own question?`, true);
 
   const menu = document.createElement("div");
 
@@ -143,9 +144,9 @@ function showMoreCybersecurity() {
 function showTopics() {
   chatBody.innerHTML = "";
 
-  addMessage("<strong>Choose a cybersecurity topic:</strong>", true);
+  addMessage("<strong>Choose a topic:</strong>", true);
 
-  const topics = ["Phishing", "Malware", "Ransomware", "Social Engineering", "Password attacks", "Identity theft", "Data breaches", "Network security"];
+  const topics = ["Ransomware", "Social Engineering", "Password attacks", "Identity theft", "Data breaches", "Network security"];
 
   const menu = document.createElement("div");
 
@@ -186,7 +187,7 @@ async function askGeminiAboutTopic(topic) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: `Explain ${topic} to a university student who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips.`
+        message: `Explain ${topic} to an internet user who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips.`
       })
     });
 
@@ -249,7 +250,7 @@ function addMessage(message, allowHtml = false) {
 function enableQuestionMode() {
   chatBody.innerHTML = "";
 
-  addMessage(`<strong>Ask a cybersecurity question</strong><br><br>Ask ne anything related to cybersecurity. For example:<br><br>- What is phishing?<br>- How can I protect my passord?<br>- What should I do if I clicked a suspicious link?`, true);
+  addMessage(`<strong>Ask a cybersecurity question</strong><br><br>Ask me anything related to cybersecurity threats. For example:<br><br>- What is phishing?<br>- How can I protect my passord?<br>- What should I do if I clicked a suspicious link?`, true);
 
   input.focus();
 
@@ -307,7 +308,7 @@ async function sendMessage() {
 async function startQuiz() {
   chatBody.innerHTML = "";
 
-  addMessage("<strong>Cybersecurity knowledge test</strong><br><br>" + "Choose the answer you think is safest.", true);
+  addMessage("<strong>Knowledge test</strong><br><br>" + "Choose the answer you think is safest.", true);
 
   try {
     const response = await fetch(`${API}/quiz/start`, {
@@ -417,7 +418,7 @@ function showQuizResult(result) {
 
   menu.appendChild(createButton("Try again", startQuiz));
 
-  menu.appendChild(createButton("Learn Cybersecurity", showBeginnerLessons));
+  menu.appendChild(createButton("Learn about Cybersecurity threats", showBeginnerLessons));
 
   menu.appendChild(createButton("Main menu", mainMenu));
 
