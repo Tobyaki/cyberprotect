@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins';
+    font-family: 'Montserrat';
 }
 
 body {
@@ -17,7 +17,7 @@ body {
     width: 420px;
     height: 600px;
     border-radius: 18px;
-    background: #001a41;
+    background: #191919;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -26,10 +26,10 @@ body {
 
 .chat-header {
     /* background: #0f4c81; */
-    color: #4b8eff;
+    color: white;
     padding: 18px;
     font-size: 20px;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 .chat-body {
@@ -39,7 +39,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background: #001a41;
+    background: #191919;
 }
 
 .message {
@@ -56,7 +56,7 @@ body {
 }
 
 .user {
-    background: #0f4c81;
+    background: #202020;
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 5px;
@@ -64,11 +64,11 @@ body {
 
 .menu-button {
     width: 100%;
-    border: none;
+    border: 0.2px solid white;
     padding: 14px;
     margin-top: 8px;
     border-radius: 10px;
-    background: #0f4c81;
+    background: #272727;
     color: white;
     font-size: 15px;
     cursor: pointer;
@@ -76,7 +76,7 @@ body {
 }
 
 .menu-button:hover {
-    background: #1560a5;
+    background: rgb(19, 18, 18);
     transition: 0.3s ease-in-out;
 }
 
@@ -85,9 +85,9 @@ body {
     padding: 12px;
     margin-top: 8px;
     border-radius: 9px;
-    border: 1px solid #0f4c81;
-    background: white;
-    color: #0f4c81;
+    border: 1px solid white;
+    background: #272727;
+    color: white;
     cursor: pointer;
     text-align: left;
 }
@@ -97,26 +97,26 @@ body {
 }
 
 .bot {
-    background: white;
-    color: #333;
+    background: #303030;
+    color: white;
     align-self: flex-start;
     border-bottom-left-radius: 5px;
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
 }
 
 .chat-footer {
     display: flex;
     padding: 15px;
     gap: 10px;
-    background: #001a41;
+    background: #191919;
 }
 
 .chat-footer input {
     flex: 1;
     padding: 12px;
     border-radius: 10px;
-    border: 0.2px solid #ccc;
-    background: #001a41;
+    border: 0.1px solid #ccc;
+    background: #303030;
     outline: none;
     font-size: 15px;
     color: white;
@@ -127,9 +127,9 @@ body {
 }
 
 .chat-footer button {
-    background: #0f4c81;
+    background: #303030;
     color: white;
-    border: none;
+    border: 0.1px solid white;
     padding: 12px 20px;
     border-radius: 10px;
     cursor: pointer;
@@ -137,7 +137,7 @@ body {
 }
 
 .chat-footer button:hover {
-    background: #1560a5;
+    background: rgb(19, 18, 18);
     transition: 0.3s ease-in-out;
 }
 
@@ -173,7 +173,7 @@ body {
 
 .typing {
     font-style: italic;
-    color: #777;
+    color: white;
 }
 
 @keyframes fade {
