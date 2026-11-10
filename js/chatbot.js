@@ -4,8 +4,8 @@
    - Lessons and quiz still use the REST API.
 ------------------------------------------------------------------- */
 
-// const SERVER = "https://cyberprotect-app-ghfgdnh3f2abevaa.austriaeast-01.azurewebsites.net";
-const SERVER = "https://localhost:7249";
+const SERVER = "https://cyberprotect-app-ghfgdnh3f2abevaa.austriaeast-01.azurewebsites.net";
+// const SERVER = "https://localhost:7249";
 const API = `${SERVER}/api/chat`;
 const HUB_URL = `${SERVER}/hubs/chat`;
 
