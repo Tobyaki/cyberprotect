@@ -1,189 +1,534 @@
+:root {
+    --bg: #0b0f14;
+    --panel: #11161d;
+    --surface: #171d26;
+    --surface-2: #1e2632;
+    --border: #283142;
+    --text: #e8edf4;
+    --muted: #8e9aae;
+    --accent: #2dd4bf;
+    --accent-ink: #04201c;
+    --good: #34d399;
+    --bad: #f87171;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('/fonts/Inter.ttf');
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Montserrat';
+}
+
+html,
+body {
+    height: 100%;
 }
 
 body {
-    background: #030303;
+    /* font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; */
+    font-family: 'Inter', sans-serif;
+    background:
+        radial-gradient(1000px 500px at 15% -10%, #12312f 0%, transparent 60%),
+        var(--bg);
+    color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100dvh;
+    padding: 16px;
+    -webkit-font-smoothing: antialiased;
 }
 
+/* ---------- Layout ---------- */
+
 .chat-container {
-    width: 420px;
-    height: 600px;
-    border-radius: 18px;
-    background: #191919;
+    width: min(760px, 100%);
+    height: min(860px, 100%);
     display: flex;
     flex-direction: column;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, .15);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    animation: rise 0.5s ease;
 }
 
 .chat-header {
-    /* background: #0f4c81; */
-    color: white;
-    padding: 18px;
-    font-size: 20px;
-    /* font-weight: bold; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #151c26, var(--panel));
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(45, 212, 191, 0.12);
+    border: 1px solid rgba(45, 212, 191, 0.35);
+    font-size: 22px;
+}
+
+.brand h1 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.brand p {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    white-space: nowrap;
+}
+
+.status .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f5b942;
+}
+
+.status[data-state='online'] .dot {
+    background: var(--good);
+    box-shadow: 0 0 8px var(--good);
+}
+
+.status[data-state='offline'] .dot {
+    background: var(--bad);
+}
+
+.status[data-state='connecting'] .dot,
+.status[data-state='reconnecting'] .dot {
+    animation: pulse 1s ease-in-out infinite;
 }
 
 .chat-body {
     flex: 1;
-    padding: 20px;
     overflow-y: auto;
+    padding: 22px 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    background: #191919;
+    gap: 14px;
+    scroll-behavior: auto;
 }
+
+.chat-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 8px;
+}
+
+/* ---------- Messages ---------- */
 
 .message {
-    max-width: 75%;
+    max-width: 88%;
     padding: 12px 16px;
     border-radius: 18px;
-    line-height: 1.5;
-    word-wrap: break-word;
-    animation: fade .2s ease;
-}
-
-.message-bot {
-    color: white;
-}
-
-.user {
-    background: #202020;
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 5px;
-}
-
-.menu-button {
-    width: 100%;
-    border: 0.2px solid white;
-    padding: 14px;
-    margin-top: 8px;
-    border-radius: 10px;
-    background: #272727;
-    color: white;
+    line-height: 1.6;
     font-size: 15px;
-    cursor: pointer;
-    text-align: left;
+    overflow-wrap: anywhere;
+    animation: rise 0.25s ease;
 }
 
-.menu-button:hover {
-    background: rgb(19, 18, 18);
-    transition: 0.3s ease-in-out;
+.message.bot {
+    align-self: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 6px;
 }
 
+.message.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 500;
+    border-bottom-right-radius: 6px;
+}
+
+.message.bot p + p,
+.message.bot p + ul,
+.message.bot ul + p,
+.message.bot ol + p,
+.message.bot p + ol {
+    margin-top: 10px;
+}
+
+.message.bot ul,
+.message.bot ol {
+    padding-left: 20px;
+    margin-top: 8px;
+}
+
+.message.bot li + li {
+    margin-top: 4px;
+}
+
+.message.bot strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+.message.bot a {
+    color: var(--accent);
+}
+
+.message.bot code {
+    background: var(--surface-2);
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+.message.streaming::after {
+    content: '\258D';
+    color: var(--accent);
+    margin-left: 2px;
+    animation: blink 1s steps(2) infinite;
+}
+
+.message.error {
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #fecaca;
+}
+
+.dots {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    height: 22px;
+}
+
+.dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: bounce 1.2s infinite ease-in-out;
+}
+
+.dots span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.dots span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* ---------- Buttons ---------- */
+
+.menu {
+    align-self: flex-start;
+    width: min(100%, 540px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: rise 0.25s ease;
+}
+
+.menu-button,
 .option-button {
     width: 100%;
-    padding: 12px;
-    margin-top: 8px;
-    border-radius: 9px;
-    border: 1px solid white;
-    background: #272727;
-    color: white;
-    cursor: pointer;
     text-align: left;
-}
-
-.option-button:hover {
-    background: #eef6ff;
-}
-
-.bot {
-    background: #303030;
-    color: white;
-    align-self: flex-start;
-    border-bottom-left-radius: 5px;
-    /* border: 1px solid #ddd; */
-}
-
-.chat-footer {
-    display: flex;
-    padding: 15px;
-    gap: 10px;
-    background: #191919;
-}
-
-.chat-footer input {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
-    border: 0.1px solid #ccc;
-    background: #303030;
-    outline: none;
-    font-size: 15px;
-    color: white;
-}
-
-.chat-footer input::placeholder {
-    color: #888;
-}
-
-.chat-footer button {
-    background: #303030;
-    color: white;
-    border: 0.1px solid white;
-    padding: 12px 20px;
-    border-radius: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    font-size: 14.5px;
     cursor: pointer;
-    transition: .2s;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
 }
 
-.chat-footer button:hover {
-    background: rgb(19, 18, 18);
-    transition: 0.3s ease-in-out;
+.menu-button.primary {
+    background: rgba(45, 212, 191, 0.12);
+    border-color: rgba(45, 212, 191, 0.45);
+}
+
+.menu-button:hover,
+.option-button:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: #1a2b2e;
+    transform: translateY(-1px);
+}
+
+.option-button:disabled {
+    cursor: default;
+    opacity: 0.75;
+}
+
+.option-button.is-correct {
+    border-color: var(--good);
+    background: rgba(52, 211, 153, 0.14);
+    opacity: 1;
+}
+
+.option-button.is-wrong {
+    border-color: var(--bad);
+    background: rgba(248, 113, 113, 0.14);
+    opacity: 1;
+}
+
+.menu-button.quiet {
+    background: transparent;
+    color: var(--muted);
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.quiz-card {
+    width: min(100%, 560px);
+}
+
+.quiz-card .option-button {
+    margin-top: 8px;
+}
+
+.quiz-kicker,
+.lesson-kicker {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.verdict {
+    font-weight: 700;
+}
+
+.verdict.correct {
+    color: var(--good);
+}
+
+.verdict.incorrect {
+    color: var(--bad);
+}
+
+.score-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.score-grid div {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.score-grid span {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.score-grid strong {
+    font-size: 18px;
+}
+
+/* ---------- Lessons ---------- */
+
+.lesson-card {
+    max-width: 100%;
+    width: 100%;
 }
 
 .lesson-title {
     font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
 .lesson-section {
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
-.lesson-section strong {
-    display: block;
-    margin-bottom: 5px;
+.lesson-section h3 {
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 6px;
 }
 
-.lesson-tip {
-    margin-left: 20px;
-    margin-bottom: 4px;
+.lesson-section ul {
+    padding-left: 20px;
 }
 
-.correct {
-    color: #198754;
-    font-weight: bold;
+.lesson-section li + li {
+    margin-top: 4px;
 }
 
-.incorrect {
-    color: #dc3545;
-    font-weight: bold;
+.lesson-section.recap {
+    background: rgba(45, 212, 191, 0.08);
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
 }
 
-.typing {
-    font-style: italic;
-    color: white;
+.lesson-sources {
+    font-size: 13px;
+    color: var(--muted);
 }
 
-@keyframes fade {
+.lesson-sources a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.lesson-sources a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Footer ---------- */
+
+.chat-footer {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+}
+
+.chat-footer input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 15px;
+}
+
+.chat-footer input::placeholder {
+    color: #6b778a;
+}
+
+.chat-footer button {
+    padding: 0 22px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s, background 0.2s;
+}
+
+.chat-footer button:hover {
+    filter: brightness(1.08);
+}
+
+.chat-footer button.stop {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* ---------- Animation ---------- */
+
+@keyframes rise {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%,
+    80%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: translateY(-5px);
+        opacity: 1;
+    }
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 0;
+    }
+
+    .chat-container {
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+    }
+
+    .brand p {
+        display: none;
+    }
+
+    .message {
+        max-width: 94%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
     }
 }
