@@ -15,6 +15,30 @@ const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const statusEl = document.getElementById("connectionStatus");
 const statusText = document.getElementById("statusText");
+const themeToggle = document.getElementById("themeToggle");
+
+// Light / Dark theme
+function updateThemeButton(theme) {
+  themeToggle.textContent = theme === "light" ? "\u263E" : "\u2600";
+  themeToggle.setAttribute("aria-label", theme === "light" ? "Switch to dark theme" : "Switch to light theme");
+}
+
+themeToggle.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  const next = current === "light" ? "dark" : "light";
+
+  document.documentElement.setAttribute("data-theme", next);
+
+  try {
+    localStorage.setItem("theme", next);
+  } catch (error) {
+    //Storage can be blocked
+  }
+
+  updateThemeButton(next);
+});
+
+updateThemeButton(document.documentElement.getAttribute("data-theme") || "dark");
 
 let quizSession = null;
 let lessons = [];
