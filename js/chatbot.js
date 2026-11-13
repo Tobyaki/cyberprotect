@@ -1,10 +1,5 @@
-/* ------------------------------------------------------------------
-   CyberProtect front end
-   - Chat answers stream over SignalR (WebSocket) token by token.
-   - Lessons and quiz still use the REST API.
-------------------------------------------------------------------- */
-
-const SERVER = "https://cyberprotect-app-ghfgdnh3f2abevaa.austriaeast-01.azurewebsites.net";
+const SERVER =
+  "https://cyberprotect-app-ghfgdnh3f2abevaa.austriaeast-01.azurewebsites.net";
 // const SERVER = "https://localhost:7249";
 const API = `${SERVER}/api/chat`;
 const HUB_URL = `${SERVER}/hubs/chat`;
@@ -20,7 +15,10 @@ const themeToggle = document.getElementById("themeToggle");
 // Light / Dark theme
 function updateThemeButton(theme) {
   themeToggle.textContent = theme === "light" ? "\u263E" : "\u2600";
-  themeToggle.setAttribute("aria-label", theme === "light" ? "Switch to dark theme" : "Switch to light theme");
+  themeToggle.setAttribute(
+    "aria-label",
+    theme === "light" ? "Switch to dark theme" : "Switch to light theme",
+  );
 }
 
 themeToggle.addEventListener("click", () => {
@@ -38,13 +36,13 @@ themeToggle.addEventListener("click", () => {
   updateThemeButton(next);
 });
 
-updateThemeButton(document.documentElement.getAttribute("data-theme") || "dark");
+updateThemeButton(
+  document.documentElement.getAttribute("data-theme") || "dark",
+);
 
 let quizSession = null;
 let lessons = [];
 let current = null; // the answer that is currently streaming, if any
-
-/* ---------------- Small DOM helpers ---------------- */
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -92,8 +90,10 @@ function createButton(text, callback, className = "menu-button") {
 
 function addMenu(items) {
   const menu = el("div", "menu");
-  items.forEach(item => {
-    menu.appendChild(createButton(item.label, item.onClick, item.className || "menu-button"));
+  items.forEach((item) => {
+    menu.appendChild(
+      createButton(item.label, item.onClick, item.className || "menu-button"),
+    );
   });
   chatBody.appendChild(menu);
   scrollToBottom();
@@ -112,7 +112,7 @@ function formatMarkdown(text) {
 }
 
 if (typeof DOMPurify !== "undefined") {
-  DOMPurify.addHook("afterSanitizeAttributes", node => {
+  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
     if (node.tagName === "A") {
       node.setAttribute("target", "_blank");
       node.setAttribute("rel", "noopener noreferrer");
@@ -120,16 +120,15 @@ if (typeof DOMPurify !== "undefined") {
   });
 }
 
-/* ---------------- SignalR connection ---------------- */
-
 // null when the SignalR script could not be loaded; the rest of the page still works.
-const connection = typeof signalR !== "undefined"
-  ? new signalR.HubConnectionBuilder()
-      .withUrl(HUB_URL)
-      .withAutomaticReconnect([0, 1000, 3000, 5000, 10000])
-      .configureLogging(signalR.LogLevel.Warning)
-      .build()
-  : null;
+const connection =
+  typeof signalR !== "undefined"
+    ? new signalR.HubConnectionBuilder()
+        .withUrl(HUB_URL)
+        .withAutomaticReconnect([0, 1000, 3000, 5000, 10000])
+        .configureLogging(signalR.LogLevel.Warning)
+        .build()
+    : null;
 
 function setStatus(state, label) {
   statusEl.dataset.state = state;
@@ -159,7 +158,7 @@ function startConnection() {
         setStatus("online", "Online");
         return true;
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("SignalR connection failed:", error);
         setStatus("offline", "Offline");
         return false;
@@ -178,13 +177,14 @@ async function ensureConnected() {
   const state = connection.state;
 
   if (state === signalR.HubConnectionState.Connected) return true;
-  if (state === signalR.HubConnectionState.Disconnected) return startConnection();
+  if (state === signalR.HubConnectionState.Disconnected)
+    return startConnection();
   if (startPromise) return startPromise;
 
   return false; // reconnecting; automatic reconnect is already working on it
 }
 
-/* ---------------- Streaming answers ---------------- */
+/*Streaming answers*/
 
 function setBusy(busy) {
   sendBtn.textContent = busy ? "Stop" : "Send";
@@ -197,11 +197,17 @@ function streamAnswer(question, afterDone) {
   setBusy(true);
 
   const bubble = el("div", "message bot");
-  bubble.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  bubble.innerHTML =
+    '<span class="dots"><span></span><span></span><span></span></span>';
   chatBody.appendChild(bubble);
   scrollToBottom();
 
-  const state = { text: "", subscription: null, finished: false, renderQueued: false };
+  const state = {
+    text: "",
+    subscription: null,
+    finished: false,
+    renderQueued: false,
+  };
 
   const render = () => {
     state.renderQueued = false;
@@ -243,21 +249,23 @@ function streamAnswer(question, afterDone) {
     stop: () => {
       if (state.subscription) state.subscription.dispose();
       finish();
-    }
+    },
   };
 
-  ensureConnected().then(connected => {
+  ensureConnected().then((connected) => {
     if (state.finished) return;
 
     if (!connected) {
-      finish(connection
-        ? "I can't reach the server right now. Please try again in a moment."
-        : "The chat scripts could not load. Check your internet connection and refresh the page.");
+      finish(
+        connection
+          ? "I can't reach the server right now. Please try again in a moment."
+          : "The chat scripts could not load. Check your internet connection and refresh the page.",
+      );
       return;
     }
 
     state.subscription = connection.stream("Stream", question).subscribe({
-      next: chunk => {
+      next: (chunk) => {
         if (!state.text) bubble.textContent = "";
         state.text += chunk;
         bubble.classList.add("streaming");
@@ -268,11 +276,17 @@ function streamAnswer(question, afterDone) {
         }
       },
       complete: () => finish(),
-      error: error => {
+      error: (error) => {
         console.error("Stream error:", error);
-        const match = /HubException: (.*)$/.exec(error && error.message ? error.message : "");
-        finish(match ? match[1] : "Sorry, I couldn't contact the cybersecurity assistant.");
-      }
+        const match = /HubException: (.*)$/.exec(
+          error && error.message ? error.message : "",
+        );
+        finish(
+          match
+            ? match[1]
+            : "Sorry, I couldn't contact the cybersecurity assistant.",
+        );
+      },
     });
   });
 }
@@ -281,21 +295,25 @@ function stopStreaming() {
   if (current) current.stop();
 }
 
-/* ---------------- Welcome and menus ---------------- */
+/*Welcome and menus*/
 
 function showWelcome() {
   clearChat();
 
   addBotHtml(
     "<strong>Hello! Welcome to CyberProtect.</strong><br><br>" +
-    "I'm your cybersecurity awareness assistant. I can help you learn cybersecurity threat basics, " +
-    "explore topics, and test your knowledge using real world scenarios.<br><br>What would you like to do?"
+      "I'm your cybersecurity awareness assistant. I can help you learn cybersecurity threat basics, " +
+      "explore topics, and test your knowledge using real world scenarios.<br><br>What would you like to do?",
   );
 
   addMenu([
-    { label: "Basic threats for beginners", onClick: showBeginnerLessons, className: "menu-button primary" },
+    {
+      label: "Basic threats for beginners",
+      onClick: showBeginnerLessons,
+      className: "menu-button primary",
+    },
     { label: "Know more about threats", onClick: showMoreCybersecurity },
-    { label: "Test your knowledge", onClick: startQuiz }
+    { label: "Test your knowledge", onClick: startQuiz },
   ]);
 }
 
@@ -304,7 +322,7 @@ function mainMenu() {
   showWelcome();
 }
 
-/* ---------------- Lessons ---------------- */
+/*Lessons*/
 
 async function loadLessons() {
   if (lessons.length) return lessons;
@@ -320,18 +338,24 @@ async function showBeginnerLessons() {
   stopStreaming();
   clearChat();
 
-  addBotHtml("<strong>Basic threats for beginners</strong><br><br>Let's learn them step by step.");
+  addBotHtml(
+    "<strong>Basic threats for beginners</strong><br><br>Let's learn them step by step.",
+  );
 
   try {
     const all = await loadLessons();
 
-    const items = all.map(lesson => ({
+    const items = all.map((lesson) => ({
       label: `${lesson.id}. ${lesson.title}`,
       onClick: () => showLesson(lesson.id),
-      className: "option-button"
+      className: "option-button",
     }));
 
-    items.push({ label: "Main menu", onClick: mainMenu, className: "menu-button quiet" });
+    items.push({
+      label: "Main menu",
+      onClick: mainMenu,
+      className: "menu-button quiet",
+    });
 
     addMenu(items);
   } catch (error) {
@@ -350,14 +374,16 @@ function lessonSection(title, content, extraClass = "") {
 function renderLesson(lesson) {
   const card = el("article", "message bot lesson-card");
 
-  card.appendChild(el("div", "lesson-kicker", `Lesson ${lesson.id} of ${lessons.length}`));
+  card.appendChild(
+    el("div", "lesson-kicker", `Lesson ${lesson.id} of ${lessons.length}`),
+  );
   card.appendChild(el("h2", "lesson-title", lesson.title));
   card.appendChild(el("p", "", lesson.explanation));
 
   card.appendChild(lessonSection("Example", el("p", "", lesson.example)));
 
   const tips = el("ul");
-  lesson.tips.forEach(tip => tips.appendChild(el("li", "", tip)));
+  lesson.tips.forEach((tip) => tips.appendChild(el("li", "", tip)));
   card.appendChild(lessonSection("Safety tips", tips));
 
   card.appendChild(lessonSection("Recap", el("p", "", lesson.recap), "recap"));
@@ -384,7 +410,7 @@ function renderLesson(lesson) {
 async function showLesson(id) {
   try {
     const all = await loadLessons();
-    const lesson = all.find(item => item.id === id);
+    const lesson = all.find((item) => item.id === id);
 
     if (!lesson) throw new Error("Lesson not found");
 
@@ -393,12 +419,20 @@ async function showLesson(id) {
 
     const items = [];
 
-    if (all.some(item => item.id === id + 1)) {
-      items.push({ label: "Next lesson", onClick: () => showLesson(id + 1), className: "menu-button primary" });
+    if (all.some((item) => item.id === id + 1)) {
+      items.push({
+        label: "Next lesson",
+        onClick: () => showLesson(id + 1),
+        className: "menu-button primary",
+      });
     }
 
     items.push({ label: "All lessons", onClick: showBeginnerLessons });
-    items.push({ label: "Main menu", onClick: mainMenu, className: "menu-button quiet" });
+    items.push({
+      label: "Main menu",
+      onClick: mainMenu,
+      className: "menu-button quiet",
+    });
 
     addMenu(items);
     chatBody.scrollTop = 0;
@@ -408,18 +442,20 @@ async function showLesson(id) {
   }
 }
 
-/* ---------------- Topics and questions ---------------- */
+/*Topics and questions*/
 
 function showMoreCybersecurity() {
   stopStreaming();
   clearChat();
 
-  addBotHtml("<strong>Know more about threats</strong><br><br>Would you like to choose a topic or ask your own question?");
+  addBotHtml(
+    "<strong>Know more about threats</strong><br><br>Would you like to choose a topic or ask your own question?",
+  );
 
   addMenu([
     { label: "Choose a topic", onClick: showTopics },
     { label: "Ask a question", onClick: enableQuestionMode },
-    { label: "Main menu", onClick: mainMenu, className: "menu-button quiet" }
+    { label: "Main menu", onClick: mainMenu, className: "menu-button quiet" },
   ]);
 }
 
@@ -429,15 +465,26 @@ function showTopics() {
 
   addBotHtml("<strong>Choose a topic:</strong>");
 
-  const topics = ["Ransomware", "Social Engineering", "Password attacks", "Identity theft", "Data breaches", "Network security"];
+  const topics = [
+    "Ransomware",
+    "Social Engineering",
+    "Password attacks",
+    "Identity theft",
+    "Data breaches",
+    "Network security",
+  ];
 
-  const items = topics.map(topic => ({
+  const items = topics.map((topic) => ({
     label: topic,
     onClick: () => askAboutTopic(topic),
-    className: "option-button"
+    className: "option-button",
   }));
 
-  items.push({ label: "Main menu", onClick: mainMenu, className: "menu-button quiet" });
+  items.push({
+    label: "Main menu",
+    onClick: mainMenu,
+    className: "menu-button quiet",
+  });
 
   addMenu(items);
 }
@@ -449,10 +496,15 @@ function askAboutTopic(topic) {
 
   streamAnswer(
     `Explain ${topic} to an internet user who is a beginner in cybersecurity. Include what it is, why it matters, a realistic example and practical defensive tips.`,
-    () => addMenu([
-      { label: "Choose another topic", onClick: showTopics },
-      { label: "Main menu", onClick: mainMenu, className: "menu-button quiet" }
-    ])
+    () =>
+      addMenu([
+        { label: "Choose another topic", onClick: showTopics },
+        {
+          label: "Main menu",
+          onClick: mainMenu,
+          className: "menu-button quiet",
+        },
+      ]),
   );
 }
 
@@ -462,22 +514,26 @@ function enableQuestionMode() {
 
   addBotHtml(
     "<strong>Ask a cybersecurity question</strong><br><br>" +
-    "Ask me anything related to cybersecurity threats. For example:"
+      "Ask me anything related to cybersecurity threats. For example:",
   );
 
   const examples = [
     "What is phishing?",
     "How can I protect my password?",
-    "What should I do if I clicked a suspicious link?"
+    "What should I do if I clicked a suspicious link?",
   ];
 
-  const items = examples.map(question => ({
+  const items = examples.map((question) => ({
     label: question,
     onClick: () => sendText(question),
-    className: "option-button"
+    className: "option-button",
   }));
 
-  items.push({ label: "Main menu", onClick: mainMenu, className: "menu-button quiet" });
+  items.push({
+    label: "Main menu",
+    onClick: mainMenu,
+    className: "menu-button quiet",
+  });
 
   addMenu(items);
   input.focus();
@@ -492,13 +548,15 @@ function sendText(text) {
   streamAnswer(message);
 }
 
-/* ---------------- Quiz ---------------- */
+/*Quiz*/
 
 async function startQuiz() {
   stopStreaming();
   clearChat();
 
-  addBotHtml("<strong>Knowledge test</strong><br><br>Choose the answer you think is safest.");
+  addBotHtml(
+    "<strong>Knowledge test</strong><br><br>Choose the answer you think is safest.",
+  );
 
   try {
     const response = await fetch(`${API}/quiz/start`, { method: "POST" });
@@ -529,7 +587,11 @@ function showQuizQuestion(question) {
 
   question.options.forEach((option, index) => {
     const label = `${String.fromCharCode(65 + index)}. ${option}`;
-    const button = createButton(label, () => answerQuiz(index, button, buttons), "option-button");
+    const button = createButton(
+      label,
+      () => answerQuiz(index, button, buttons),
+      "option-button",
+    );
 
     buttons.push(button);
     card.appendChild(button);
@@ -540,13 +602,13 @@ function showQuizQuestion(question) {
 }
 
 async function answerQuiz(answer, chosenButton, buttons) {
-  buttons.forEach(button => (button.disabled = true));
+  buttons.forEach((button) => (button.disabled = true));
 
   try {
     const response = await fetch(`${API}/quiz/answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId: quizSession, answer })
+      body: JSON.stringify({ sessionId: quizSession, answer }),
     });
 
     if (!response.ok) {
@@ -559,7 +621,11 @@ async function answerQuiz(answer, chosenButton, buttons) {
     chosenButton.classList.add(data.correct ? "is-correct" : "is-wrong");
 
     const feedback = el("div", "message bot");
-    const verdict = el("span", `verdict ${data.correct ? "correct" : "incorrect"}`, data.correct ? "Correct" : "Not correct");
+    const verdict = el(
+      "span",
+      `verdict ${data.correct ? "correct" : "incorrect"}`,
+      data.correct ? "Correct" : "Not correct",
+    );
 
     feedback.appendChild(verdict);
     feedback.appendChild(el("p", "", data.explanation));
@@ -574,7 +640,7 @@ async function answerQuiz(answer, chosenButton, buttons) {
     }
   } catch (error) {
     console.error("Quiz error:", error);
-    buttons.forEach(button => (button.disabled = false));
+    buttons.forEach((button) => (button.disabled = false));
     addBotText("Unable to process your answer.", "error");
   }
 }
@@ -585,9 +651,11 @@ function showQuizResult(result) {
   if (result.percentage >= 80) {
     feedback = "Excellent! You demonstrated solid knowledge on cybersecurity.";
   } else if (result.percentage >= 60) {
-    feedback = "Good job! You have a solid foundation, but you still need improvement.";
+    feedback =
+      "Good job! You have a solid foundation, but you still need improvement.";
   } else {
-    feedback = "Nice effort. Use beginner lessons to strengthen your cybersecurity knowledge and try again.";
+    feedback =
+      "Nice effort. Use beginner lessons to strengthen your cybersecurity knowledge and try again.";
   }
 
   const card = el("div", "message bot");
@@ -598,7 +666,7 @@ function showQuizResult(result) {
     ["Score", `${result.score}/${result.totalQuestions}`],
     ["Percentage", `${result.percentage}%`],
     ["Correct", String(result.correctAnswers)],
-    ["Incorrect", String(result.incorrectAnswers)]
+    ["Incorrect", String(result.incorrectAnswers)],
   ].forEach(([label, value]) => {
     const cell = el("div");
     cell.appendChild(el("span", "", label));
@@ -611,22 +679,29 @@ function showQuizResult(result) {
   chatBody.appendChild(card);
 
   addMenu([
-    { label: "Try again", onClick: startQuiz, className: "menu-button primary" },
-    { label: "Learn about cybersecurity threats", onClick: showBeginnerLessons },
-    { label: "Main menu", onClick: mainMenu, className: "menu-button quiet" }
+    {
+      label: "Try again",
+      onClick: startQuiz,
+      className: "menu-button primary",
+    },
+    {
+      label: "Learn about cybersecurity threats",
+      onClick: showBeginnerLessons,
+    },
+    { label: "Main menu", onClick: mainMenu, className: "menu-button quiet" },
   ]);
 }
 
-/* ---------------- Input handling ---------------- */
+/*Input handling*/
 
-sendBtn.addEventListener("click", event => {
+sendBtn.addEventListener("click", (event) => {
   if (current) {
     event.preventDefault(); // stop the form from submitting; this click means "Stop"
     stopStreaming();
   }
 });
 
-chatForm.addEventListener("submit", event => {
+chatForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   if (current) return;
@@ -636,7 +711,7 @@ chatForm.addEventListener("submit", event => {
   sendText(message);
 });
 
-/* ---------------- Start ---------------- */
+/*Start*/
 
 showWelcome();
 startConnection(); // connect early so the first question does not pay the handshake cost

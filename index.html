@@ -10,7 +10,11 @@
     <script>
       try {
         var saved = localStorage.getItem("theme");
-        var theme = saved || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        var theme =
+          saved ||
+          (window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark");
         document.documentElement.setAttribute("data-theme", theme);
       } catch (e) {
         document.documentElement.setAttribute("data-theme", "dark");
@@ -34,12 +38,23 @@
         </div>
 
         <div class="header-actions">
-          <div class="status" id="connectionStatus" data-state="connecting" role="status">
+          <div
+            class="status"
+            id="connectionStatus"
+            data-state="connecting"
+            role="status"
+          >
             <span class="dot"></span>
             <span id="statusText">Connecting&hellip;</span>
           </div>
 
-          <button type="button" class="theme-toggle" id="themeToggle" aria-label="switch to light theme" title="Switch theme"></button>
+          <button
+            type="button"
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="switch to light theme"
+            title="Switch theme"
+          ></button>
         </div>
       </header>
 
